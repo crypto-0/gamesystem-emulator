@@ -8,19 +8,19 @@ public interface Cpu {
   public Boolean completed();
 
   interface Opcode{
-    public void execute();
+    public int execute();
   }
 
   interface AddressMode{
-    public long execute();
+    public int execute();
   }
 
   class Register{
-    private long data;
-    public long read(){
+    private int data;
+    public int read(){
       return data;
     };
-    public void write(long value ){
+    public void write(int value ){
       data = value;
     }
   }
@@ -32,8 +32,8 @@ public interface Cpu {
       this.r2 = r2;
     }
 
-    public long read(){
-      long temp = r1.read();
+    public int read(){
+      int temp = r1.read();
       temp = temp << 16;
       temp = temp | r2.read();
       return temp;
@@ -48,7 +48,12 @@ public interface Cpu {
     public Opcode op;
     public AddressMode addressMode;
     public int cycles;
-    public String name;
+    //public String name;
+    Instruction(Opcode op,AddressMode addressMode,int cycles){
+      this.op = op;
+      this.addressMode = addressMode;
+      this.cycles = cycles;
+    }
   }
 }
 

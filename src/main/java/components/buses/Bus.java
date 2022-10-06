@@ -12,10 +12,10 @@ public class Bus {
     this.cpu.connectbus(this);
   }
 
-  public void cpuWrite(int address, short data){
+  public void cpuWrite(int address, short data,boolean ioWrite){
     this.ram.write(address,data);
   }
-  public short cpuRead(int address){
+  public short cpuRead(int address,boolean ioRead){
     return this.ram.read(address);
   }
 }
