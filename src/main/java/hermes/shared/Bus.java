@@ -1,12 +1,13 @@
-package main.java.components.buses;
-import main.java.components.cpu.Cpu;
-import main.java.components.memory.Ram;
+package hermes.gamesystem.component.bus;
+import hermes.gamesystem.component.memory.Ram;
+import hermes.gamesystem.component.cpu.Cpu;
+
 
 public class Bus {
-  public Ram ram;
-  public Cpu cpu;
+  private Ram ram;
+  private Cpu cpu;
   
-  Bus(Cpu cpu,Ram ram){
+  public Bus(Cpu cpu,Ram ram){
     this.cpu = cpu;
     this.ram = ram;
     this.cpu.connectbus(this);

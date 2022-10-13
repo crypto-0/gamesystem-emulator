@@ -1,11 +1,16 @@
-package main.java.components.cpu;
+package hermes.chip8;
+import hermes.shared.*;
 import java.util.Random;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.border.TitledBorder;
+import javax.swing.plaf.DimensionUIResource;
+import javax.swing.table.TableColumnModel;
+import java.awt.Color;
+import java.awt.Dimension;
 
-import main.java.components.buses.Bus;
-import main.java.components.cpu.Cpu;
-
-class Chip8Cpu implements Cpu{
-  Register[] registers = new Register[17];
+public class Chip8Cpu  extends JPanel implements Cpu {
+  Register[] registers = new Register[16];
   Bus bus;
   Register pc = new Register();
   Register sp = new Register();
@@ -33,12 +38,6 @@ class Chip8Cpu implements Cpu{
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
   };
-  //Opcode[] table = new Opcode[16];
-  //Opcode[] table8 = new Opcode[16];
-  //Opcode[] tableE = new Opcode[16];
-  //Opcode[] tableF = new Opcode[0x66];
-  //Op_00E0 op_00e0 = new Op_00E0();
-  //Op_00EE op_00EE = new Op_00EE();
   Instruction[] table = new Instruction[16];
   Instruction[] table8 = new Instruction[16];
   Instruction[] tableE = new Instruction[16];
@@ -46,12 +45,15 @@ class Chip8Cpu implements Cpu{
   Op_00E0 op_00e0 = new Op_00E0();
   Op_00EE op_00EE = new Op_00EE();
 
-
-
+  private final int PWIDTH = 200;
+  private final int PHEIGHT = 200;
+  private JTable jtable;
+  private TableColumnModel tableModel;
   public Chip8Cpu() {
+    setPreferredSize(new DimensionUIResource(PWIDTH, PHEIGHT));
     //load fontset in memory
     for (int a = 0; a < 80; a++) {
-      bus.cpuWrite(fontsetStartAddress + a,fontset[a],false);
+      //bus.cpuWrite(fontsetStartAddress + a,fontset[a],false);
     }
     //load opcode classes
     table[1] = new Instruction(new Op_1nnn(),new Imp(),1);
@@ -90,6 +92,28 @@ class Chip8Cpu implements Cpu{
     tableF[0x55] = new Instruction(new Op_Fx55(),new Imp(),1);
     tableF[0x65] = new Instruction(new Op_Fx65(),new Imp(),1);
 
+    for(int a =0; a < registers.length;a ++){
+      registers[a] = new Register();
+    }
+    
+    jtable = new JTable(10,2);
+    tableModel = jtable.getColumnModel();
+    this.setVisible(true);
+    tableModel.getColumn(0).setPreferredWidth(38);
+    tableModel.getColumn(1).setPreferredWidth(20);
+    jtable.setShowGrid(false);
+    jtable.setTableHeader(null);
+    jtable.setBackground(Color.BLACK);
+    jtable.setForeground(Color.LIGHT_GRAY);
+    this.setBackground(Color.BLACK);
+    //setPreferredSize(new Dimension(200,200));
+    setMaximumSize(getPreferredSize());
+    jtable.setPreferredSize(new Dimension(200,200));
+    add(jtable);
+    TitledBorder border = new TitledBorder("Chip8Cpu");
+    border.setTitlePosition(TitledBorder.TOP);
+    setBorder(border);
+
   }
 
 
@@ -97,7 +121,6 @@ class Chip8Cpu implements Cpu{
 
     @Override
     public int execute() {
-      // TODO Auto-generated method stub
       return 0;
     }
 
@@ -581,6 +604,7 @@ class Chip8Cpu implements Cpu{
       int temp = index.read() + 3;
       temp &=0xfff;
       index.write(temp);
+      return 0;
 
     }
 
@@ -620,31 +644,40 @@ class Chip8Cpu implements Cpu{
 
   @Override
   public void reset() {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void irq() {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void clock() {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void connectbus(Bus bus) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public Boolean completed() {
-    // TODO Auto-generated method stub
     return null;
+  }
+  public void render(){
+    String memoryPc = String.format("PC: %04X:", pc.read());
+    String memorySp = String.format("SP: %04X:", sp.read());
+    String memoryIndex = String.format("ID: %04X:", index.read());
+    jtable.setValueAt(memoryPc, 0, 0);
+    jtable.setValueAt(memorySp, 0, 1);
+    jtable.setValueAt(memoryIndex, 1, 0);
+    for(int a=0; a< registers.length / 2; a++){
+      String memoryVx = String.format("V%d: %04X:",a, registers[a].read());
+      String memoryVx2 = String.format("V%d: %04X:",a + 1, registers[a +1].read());
+      jtable.setValueAt(memoryVx, 2 + a, 0);
+      jtable.setValueAt(memoryVx2, 2 + a, 1);
+    }
   }
 }

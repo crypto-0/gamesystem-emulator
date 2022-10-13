@@ -1,5 +1,6 @@
-package main.java.components.cpu;
-import main.java.components.buses.Bus;
+package hermes.gamesystem.component.cpu;
+import hermes.gamesystem.component.bus.Bus;
+
 public interface Cpu {
   public void reset();
   public void irq();
@@ -15,8 +16,10 @@ public interface Cpu {
     public int execute();
   }
 
-  class Register{
+  public class Register{
     private int data;
+    public Register(){
+    }
     public int read(){
       return data;
     };
