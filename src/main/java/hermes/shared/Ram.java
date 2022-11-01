@@ -10,8 +10,8 @@ import java.awt.Dimension;
 
 public class Ram extends JPanel{
   private short[] memory ;//= new short[100];
-  private final int PWIDTH = 100;
-  private final int PHEIGHT = 100;
+  private final int PWIDTH = 200;
+  private final int PHEIGHT = 200;
   private JTable table;
   private TableColumnModel tableModel ;
   public Ram(int size){
@@ -30,12 +30,13 @@ public class Ram extends JPanel{
     JScrollPane jsp = new JScrollPane(table);
     this.setBackground(Color.BLACK);
     jsp.setVisible(true);
-    jsp.setPreferredSize(new Dimension(200,200));
+    jsp.setPreferredSize(new Dimension(PWIDTH,PHEIGHT));
     jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     add(jsp);
     TitledBorder border = new TitledBorder("Memory");
     border.setTitlePosition(TitledBorder.TOP);
     setBorder(border);
+    table.setFocusable(false);
   }
 
   public short read(int address){

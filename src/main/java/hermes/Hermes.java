@@ -1,24 +1,17 @@
 package hermes;
-import java.awt.BorderLayout;
 import javax.swing.JFrame;
-
-import hermes.gamesystem.component.memory.Ram;
-import hermes.gamesystem.component.cpu.Chip8Cpu;
-import hermes.gamesystem.component.bus.Bus;
+import hermes.chip8.Chip8;
 
 public class Hermes{
   public static void main(String args[]){
     final JFrame frame = new JFrame("Hermes");
-    Ram ram = new Ram(2000);
-    Chip8Cpu chip8Cpu = new Chip8Cpu();
-    Bus bus = new Bus(chip8Cpu, ram);
+    final Chip8 chip8 = new Chip8();
+    chip8.loadRom("/home/tae/projects/java/hermes/chip8-test-rom.ch8");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
-    frame.add(ram,BorderLayout.SOUTH);
-    frame.add(chip8Cpu,BorderLayout.NORTH);
+    frame.add(chip8);
     frame.pack();
-    ram.render();
-    chip8Cpu.render();
+    chip8.render();
     //frame.getContentPane().add(ram);
   }
 }

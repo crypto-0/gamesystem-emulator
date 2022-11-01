@@ -1,14 +1,17 @@
-package hermes.Chip8;
+package hermes.chip8;
 import hermes.shared.*;
 
 public class Chip8Bus extends Bus{
   private Controller delayTimer;
   private Controller soundTimer;
+  private Controller PPU;
 
-  public Chip8Bus(Controller delayTimer,Controller soundTimer,Cpu cpu,Ram ram){
+  public Chip8Bus(Cpu cpu,Ram ram,Controller delayTimer, Controller soundTimer,Controller PPU){
     super(cpu,ram);
     this.delayTimer = delayTimer;
     this.soundTimer = soundTimer;
+    this.PPU = PPU;
+    this.PPU.connectBus(this);
   }
 
 @Override

@@ -1,11 +1,10 @@
-package hermes.gamesystem.component.cpu;
-import hermes.gamesystem.component.bus.Bus;
+package hermes.shared;
 
 public interface Cpu {
   public void reset();
   public void irq();
   public void clock();
-  public void connectbus(Bus bus);
+  public void connectBus(Bus bus);
   public Boolean completed();
 
   interface Opcode{
@@ -52,7 +51,7 @@ public interface Cpu {
     public AddressMode addressMode;
     public int cycles;
     //public String name;
-    Instruction(Opcode op,AddressMode addressMode,int cycles){
+    public Instruction(Opcode op,AddressMode addressMode,int cycles){
       this.op = op;
       this.addressMode = addressMode;
       this.cycles = cycles;

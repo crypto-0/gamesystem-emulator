@@ -29,5 +29,10 @@ public void clock() {
 public int getBaseAddress() {
 	return this.baseAddress;
 }
+
+@Override
+public void connectBus(Bus bus) {
+	
+}
 }
 

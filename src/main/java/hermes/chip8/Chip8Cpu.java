@@ -4,7 +4,6 @@ import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.DimensionUIResource;
 import javax.swing.table.TableColumnModel;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,6 +17,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
   int fontsetStartAddress = 0x50;
   int stackStartAddress = 0x06cf;//to 0x6a0 48 bytes
   int vramStartAddress = 0x0700;// to 0x07ff
+  int pcStartAddress = 0x200;                                
   int opcode = 0;
   int scale = 5;
   short[] fontset = {
@@ -50,7 +50,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
   private JTable jtable;
   private TableColumnModel tableModel;
   public Chip8Cpu() {
-    setPreferredSize(new DimensionUIResource(PWIDTH, PHEIGHT));
+    setPreferredSize(new Dimension(PWIDTH, PHEIGHT));
     //load fontset in memory
     for (int a = 0; a < 80; a++) {
       //bus.cpuWrite(fontsetStartAddress + a,fontset[a],false);
@@ -106,14 +106,13 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     jtable.setBackground(Color.BLACK);
     jtable.setForeground(Color.LIGHT_GRAY);
     this.setBackground(Color.BLACK);
-    //setPreferredSize(new Dimension(200,200));
     setMaximumSize(getPreferredSize());
-    jtable.setPreferredSize(new Dimension(200,200));
+    jtable.setPreferredSize(new Dimension(PWIDTH,PHEIGHT));
     add(jtable);
     TitledBorder border = new TitledBorder("Chip8Cpu");
     border.setTitlePosition(TitledBorder.TOP);
     setBorder(border);
-
+    jtable.setFocusable(false);
   }
 
 
@@ -641,9 +640,26 @@ public class Chip8Cpu  extends JPanel implements Cpu {
 
     }
   }
+  public void loadFonts(){
+    for (int a = 0; a < 80; a++) {
+      bus.cpuWrite(fontsetStartAddress + a,fontset[a],false);
+    }
+  }
+  public void loadRom(short[] rom){
+    for(int a =0; a< rom.length;a++){
+      bus.cpuWrite(pcStartAddress + a,rom[a],false);
+    }
+
+  }
 
   @Override
   public void reset() {
+    for(Register reg: this.registers){
+      reg.write(0);
+    }
+    this.pc.write(0x200);
+    this.index.write(0);
+    this.sp.write(this.stackStartAddress);
 
   }
 
@@ -654,11 +670,6 @@ public class Chip8Cpu  extends JPanel implements Cpu {
 
   @Override
   public void clock() {
-
-  }
-
-  @Override
-  public void connectbus(Bus bus) {
 
   }
 
@@ -679,5 +690,12 @@ public class Chip8Cpu  extends JPanel implements Cpu {
       jtable.setValueAt(memoryVx, 2 + a, 0);
       jtable.setValueAt(memoryVx2, 2 + a, 1);
     }
+    repaint();
   }
+
+@Override
+public void connectBus(Bus bus) {
+  this.bus = bus;
+}
+
 }

@@ -10,16 +10,19 @@ import java.awt.Toolkit;
 public class Chip8PPU extends JPanel implements Controller {
   private short data;
   private final int baseAddress;
-  private final int PWIDTH = 192;
-  private final int PHEIGHT = 96;
+  private final int PWIDTH = 256;
+  private final int PHEIGHT = 240;
+  private final int DBWIDTH = 192;
+  private final int DBHEIGHT = 196;
   private Image dbImage = null;
   private Graphics dbg;
+  private Bus bus;
 
   public Chip8PPU(int baseAddress){
     this.baseAddress = baseAddress;
     setBackground(Color.BLACK);
     setPreferredSize(new Dimension(PWIDTH,PHEIGHT));
-    dbImage = createImage(PWIDTH, PHEIGHT);
+    setVisible(true);
   }
 
 	@Override
@@ -43,16 +46,16 @@ public class Chip8PPU extends JPanel implements Controller {
 	public int getBaseAddress() {
 		return 0;
 	}
-
   public void render(){
+    if(dbImage == null) dbImage = createImage(DBWIDTH, DBHEIGHT);
     dbg = dbImage.getGraphics();
-    dbg.setColor(Color.black);
-    dbg.fillRect(0, 0, PWIDTH, PHEIGHT);
+    dbg.setColor(Color.green);
+    dbg.fillRect(0, 0, DBWIDTH, DBHEIGHT);
     Graphics g;
     try{
       g = this.getGraphics();
       if(g != null){
-        g.drawImage(dbImage, 0, 0, null);
+        g.drawImage(dbImage, (int)((PWIDTH - DBWIDTH)/4), (int)((PHEIGHT - DBHEIGHT)/4), null);
         Toolkit.getDefaultToolkit().sync();
         g.dispose();
       }
@@ -62,4 +65,9 @@ public class Chip8PPU extends JPanel implements Controller {
     }
 
   }
+
+@Override
+public void connectBus(Bus bus) {
+  this.bus = bus;
+}
 }

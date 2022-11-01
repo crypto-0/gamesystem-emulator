@@ -1,6 +1,4 @@
-package hermes.gamesystem.component.bus;
-import hermes.gamesystem.component.memory.Ram;
-import hermes.gamesystem.component.cpu.Cpu;
+package hermes.shared;
 
 
 public class Bus {
@@ -10,7 +8,7 @@ public class Bus {
   public Bus(Cpu cpu,Ram ram){
     this.cpu = cpu;
     this.ram = ram;
-    this.cpu.connectbus(this);
+    this.cpu.connectBus(this);
   }
 
   public void cpuWrite(int address, short data,boolean ioWrite){
