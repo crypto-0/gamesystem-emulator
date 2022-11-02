@@ -9,13 +9,11 @@ public abstract class GameSystem extends JPanel implements Runnable
   private volatile boolean running = false;
   private long period = 1000 / 60;
   private int NO_DELAY_PER_YIELD = 10;
-  private boolean debug = true;
+  protected boolean debug = true;
 
   public GameSystem() {
     setBackground(Color.black);
     setFocusable(true);
-    if(debug) setPreferredSize(new Dimension(PWIDTH + 200, PHEIGHT + 200));
-    else setPreferredSize(new Dimension(PWIDTH, PHEIGHT));
 
   }
 

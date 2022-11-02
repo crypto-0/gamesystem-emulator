@@ -19,7 +19,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
   int vramStartAddress = 0x0700;// to 0x07ff
   int pcStartAddress = 0x200;                                
   int opcode = 0;
-  int scale = 5;
+  int cycles =0;
   short[] fontset = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -42,8 +42,8 @@ public class Chip8Cpu  extends JPanel implements Cpu {
   Instruction[] table8 = new Instruction[16];
   Instruction[] tableE = new Instruction[16];
   Instruction[] tableF = new Instruction[0x66];
-  Op_00E0 op_00e0 = new Op_00E0();
-  Op_00EE op_00EE = new Op_00EE();
+  Instruction inst00E0 = new Instruction(new Op_00E0(),new Imp(),1);
+  Instruction inst00EE = new Instruction(new Op_00EE(),new Imp(),1);
 
   private final int PWIDTH = 200;
   private final int PHEIGHT = 200;
@@ -51,10 +51,6 @@ public class Chip8Cpu  extends JPanel implements Cpu {
   private TableColumnModel tableModel;
   public Chip8Cpu() {
     setPreferredSize(new Dimension(PWIDTH, PHEIGHT));
-    //load fontset in memory
-    for (int a = 0; a < 80; a++) {
-      //bus.cpuWrite(fontsetStartAddress + a,fontset[a],false);
-    }
     //load opcode classes
     table[1] = new Instruction(new Op_1nnn(),new Imp(),1);
     table[2] = new Instruction(new Op_2nnn(),new Imp(),1);
@@ -141,6 +137,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     @Override
     public int execute() {
       short data = 0;
+      bus.cpuWrite(12,(short)1,true);
       for (int a =0; a < 64 * 32; a++){
         int address = a + vramStartAddress;
         bus.cpuWrite(address,data,false);
@@ -160,7 +157,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
       int temp = bus.cpuRead(address,false);
       temp = temp << 8;
       temp |= bus.cpuRead(address + 1,false);
-      sp.write(address - 2);
+      sp.write(address + 2);
       pc.write(temp);
       return 0;
     }
@@ -185,6 +182,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     @Override
     public int execute() {
       int address = sp.read() - 2;
+      sp.write(address);
       short low_byte =(short)(pc.read() & 0xff);
       short high_byte =(short)((pc.read() >> 8) & 0xff);
       bus.cpuWrite(address,high_byte,false);
@@ -460,7 +458,22 @@ public class Chip8Cpu  extends JPanel implements Cpu {
       final int x_pos = registers[Vx].read();
       final int y_pos = registers[Vy].read();
       registers[0xf].write(0);
+      bus.cpuWrite(12,(short)1,true);
+      short originalPixel;
+      short finalPixel;
+      int finalAddress;
+      short spriteByte;
       for (int a = 0; a < (opcode & 0xf); a++) {
+        spriteByte = bus.cpuRead(index.read() + a, false);
+        for(int b=0; b< 8; b++){
+          finalAddress = vramStartAddress + ((64 * ((y_pos + a)%32)) + ((b + x_pos) % 64));
+          originalPixel = bus.cpuRead(finalAddress , false);
+          finalPixel = (short)(originalPixel ^ (spriteByte>>(7-b)) & 0x1);
+          if(originalPixel == 1 && originalPixel != finalPixel){
+            registers[0xf].write(1);
+          }
+          bus.cpuWrite(finalAddress,finalPixel,false);
+        }
       }
       return 0;
     }
@@ -511,7 +524,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     @Override
     public int execute() {
       final int Vx = (opcode >> 12) & 0xf;
-      registers[Vx].write(bus.cpuRead(12,true));
+      registers[Vx].write(bus.cpuRead(4,true));
       return 0;
     }
 
@@ -582,7 +595,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     public int execute() {
       final int Vx = (opcode >> 8) & 0xf;
       int temp = (registers[Vx].read() * 5) + fontsetStartAddress;
-      temp = temp & 0xfff;
+      temp = temp & 0xffff;
       index.write(temp);
       return 0;
     }
@@ -597,12 +610,10 @@ public class Chip8Cpu  extends JPanel implements Cpu {
       final int Vx = (opcode >> 8) & 0xf;
       int result = registers[Vx].read() ;
       bus.cpuWrite(index.read() + 2,(short)(result % 10),false);
-      result = registers[Vx].read() / 10;
+      result = result/ 10;
       bus.cpuWrite(index.read() + 1,(short)(result % 10),false);
-      bus.cpuWrite(index.read() + 0,(short)(result / 10),false);
-      int temp = index.read() + 3;
-      temp &=0xfff;
-      index.write(temp);
+      result = result/10;
+      bus.cpuWrite(index.read() + 0,(short)(result),false);
       return 0;
 
     }
@@ -619,9 +630,6 @@ public class Chip8Cpu  extends JPanel implements Cpu {
         bus.cpuWrite(index.read() + a,(short)registers[a].read(),false);
       }
       return 0;
-      //index += Vx + 1;
-      //index &= 0xfff;
-
     }
 
   }
@@ -660,7 +668,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     this.pc.write(0x200);
     this.index.write(0);
     this.sp.write(this.stackStartAddress);
-
+    //this.inst00E0.op.execute();
   }
 
   @Override
@@ -670,7 +678,74 @@ public class Chip8Cpu  extends JPanel implements Cpu {
 
   @Override
   public void clock() {
-
+    if(cycles ==0){
+      opcode = bus.cpuRead(pc.read(),false);
+      opcode = opcode << 8;
+      opcode = opcode | bus.cpuRead(pc.read() + 1, false);
+      pc.write(pc.read() + 2);
+      switch (opcode){
+        case 0x00E0:
+          cycles = inst00E0.cycles;
+          cycles +=inst00E0.addressMode.execute();
+          inst00E0.op.execute();
+          break;
+        case 0x00EE:
+          cycles = inst00EE.cycles;
+          cycles +=inst00EE.addressMode.execute();
+          cycles +=inst00EE.op.execute();
+          break;
+        default:
+          int firstdigit = opcode >>12;
+          Instruction instruction;
+          switch(firstdigit){
+            case 0x8:
+              instruction = table8[(opcode & 0xf)];
+              if(instruction !=null){
+                cycles = instruction.cycles;
+                cycles += instruction.addressMode.execute();
+                cycles += instruction.op.execute();
+              }
+              else{
+                cycles =1;
+              }
+              break;
+            case 0xE:
+              instruction = tableE[(opcode & 0xf)];
+              if(instruction !=null){
+                cycles = instruction.cycles;
+                cycles += instruction.addressMode.execute();
+                cycles += instruction.op.execute();
+              }
+              else{
+                cycles =1;
+              }
+              break;
+            case 0xf:
+              instruction = tableF[(opcode & 0xff)];
+              if(instruction !=null){
+                cycles = instruction.cycles;
+                cycles += instruction.addressMode.execute();
+                cycles += instruction.op.execute();
+              }
+              else{
+                cycles =1;
+              }
+              break;
+            default:
+              instruction = table[firstdigit];
+              if(instruction !=null){
+                cycles = instruction.cycles;
+                cycles += instruction.addressMode.execute();
+                cycles += instruction.op.execute();
+              }
+              else{
+                cycles =1;
+              }
+          }
+      }
+    }
+    cycles--;
+    render();
   }
 
   @Override
@@ -684,9 +759,9 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     jtable.setValueAt(memoryPc, 0, 0);
     jtable.setValueAt(memorySp, 0, 1);
     jtable.setValueAt(memoryIndex, 1, 0);
-    for(int a=0; a< registers.length / 2; a++){
-      String memoryVx = String.format("V%d: %04X:",a, registers[a].read());
-      String memoryVx2 = String.format("V%d: %04X:",a + 1, registers[a +1].read());
+    for(int a=0; a< registers.length/2 ; a++){
+      String memoryVx = String.format("V%d: %04X:",a * 2 + 1, registers[a * 2].read());
+      String memoryVx2 = String.format("V%d: %04X:",a * 2 + 2, registers[a *2 +1].read());
       jtable.setValueAt(memoryVx, 2 + a, 0);
       jtable.setValueAt(memoryVx2, 2 + a, 1);
     }

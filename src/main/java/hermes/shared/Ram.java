@@ -40,10 +40,11 @@ public class Ram extends JPanel{
   }
 
   public short read(int address){
-    return memory[address];
+    if(address < memory.length) return memory[address];
+    return 0;
   }
   public void write(int address,short data){
-    memory[address] = data;
+    if(address < memory.length) memory[address] = data;
   }
   public void render(){
     for(int a=0; a<this.memory.length; a++){
