@@ -1,5 +1,6 @@
 package hermes;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import hermes.chip8.Chip8;
 
 public class Hermes{
   static boolean debug;
-  static File rom;
+  static InputStream rom;
   public static void main(String args[]){
     if(args.length <=1){
       help();
@@ -58,8 +59,12 @@ public class Hermes{
       else if(arg.equals("--rom")|| arg.equals("-r")){
         String romName = queue.poll();
         try{
-        URL url =(Hermes.class.getClassLoader().getResource(romName + ".ch8"));
-        rom = Paths.get(url.toURI()).toFile();
+        InputStream inputStream = Hermes.class.getResourceAsStream("/"+ romName +".ch8");
+        if(inputStream ==null){
+          System.out.println("Could not load " + romName +".ch8 rom");
+          System.exit(1);
+        }
+        rom = inputStream;
         requiredArgsFound++;
         }
         catch(Exception e){

@@ -3,6 +3,7 @@ import javax.swing.JPanel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.awt.*;
 public abstract class GameSystem extends JPanel implements Runnable, Observable, KeyListener
@@ -66,7 +67,7 @@ public abstract class GameSystem extends JPanel implements Runnable, Observable,
 
   public abstract void update();
   public abstract void render();
-  public abstract void loadRom(File file);
+  public abstract void loadRom(InputStream  inputStream);
   public void notifyObservers(KeyEvent keyEvent){
     for(Observer obs: obsList){
       obs.Update(keyEvent);

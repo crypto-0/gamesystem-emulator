@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Chip8 extends GameSystem implements Observer{
   private Chip8Cpu cpu;
@@ -94,12 +95,13 @@ public class Chip8 extends GameSystem implements Observer{
   }
 
 	@Override
-	public void loadRom(File file) {
+	public void loadRom(InputStream inputStream) {
     try{
-      FileInputStream fileInputStream = new FileInputStream(file);
+      InputStream fileInputStream = inputStream;
       int singleByte;
       int currentByteIndex = 0;
-      short rom[] = new short[(int)file.length()];
+      //short rom[] = new short[(int)file.length()];
+      short rom[] = new short[(int)fileInputStream.available()];
       while((singleByte = fileInputStream.read()) != -1){
         rom[currentByteIndex++] = (short)singleByte;
       }
