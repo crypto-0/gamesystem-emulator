@@ -14,8 +14,6 @@ import java.awt.Toolkit;
 public class Chip8PPU extends JPanel implements Controller {
   private short data;
   private final int baseAddress;
-  //private final int PWIDTH = 256;
-  //private final int PHEIGHT = 240;
   private final int PWIDTH = 420;
   private final int PHEIGHT = 420;
   private final int SCREENWIDTH = 64;
@@ -31,10 +29,10 @@ public class Chip8PPU extends JPanel implements Controller {
   public Chip8PPU(int baseAddress){
     this.baseAddress = baseAddress;
     setBackground(Color.BLACK);
-    setPreferredSize(new Dimension(PWIDTH,PHEIGHT));
-    setVisible(true);
+    setPreferredSize(new Dimension(PWIDTH + 30,PHEIGHT + 30));
     dbImage = new BufferedImage(DBWIDTH ,DBHEIGHT ,BufferedImage.TYPE_INT_RGB);
     setBorder(BorderFactory.createTitledBorder("Disp"));
+    setVisible(true);
   }
 
 	@Override
@@ -65,8 +63,11 @@ public class Chip8PPU extends JPanel implements Controller {
         for(int b =0; b<SCREENWIDTH; b++){
           finalAdress = vramStartAddress + yPos + b;
           int pixel = (int)bus.cpuRead(finalAdress, false);
+          if(pixel >1) pixel = 1;
           dbg.setColor(colors[pixel]);
           dbg.fillRect(b * width, a * height, width, height);
+          dbg.setColor(colors[0]);
+          dbg.drawRect(b * width, a * height, width, height);
         }
       }
     }

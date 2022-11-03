@@ -2,6 +2,7 @@ package hermes.shared;
 import javax.swing.JPanel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.awt.*;
 public abstract class GameSystem extends JPanel implements Runnable, Observable, KeyListener
@@ -11,6 +12,7 @@ public abstract class GameSystem extends JPanel implements Runnable, Observable,
   private long period = 1000 / 60;
   private int NO_DELAY_PER_YIELD = 10;
   protected boolean debug = true;
+  protected boolean paused = false;
   private ArrayList<Observer> obsList = new ArrayList<>();
 
   public GameSystem() {
@@ -64,7 +66,7 @@ public abstract class GameSystem extends JPanel implements Runnable, Observable,
 
   public abstract void update();
   public abstract void render();
-  public abstract void loadRom(String filename);
+  public abstract void loadRom(File file);
   public void notifyObservers(KeyEvent keyEvent){
     for(Observer obs: obsList){
       obs.Update(keyEvent);

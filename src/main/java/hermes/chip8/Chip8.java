@@ -16,11 +16,11 @@ public class Chip8 extends GameSystem implements Observer{
   private Timer delayTimer;
   private Timer soundTimer;
   private Chip8Bus bus;
-  private boolean paused = true;
   private boolean step = false;
   private final int MAXCYCLES =9;
   private int elapsecycles = 0;
-  public Chip8(){
+  public Chip8(boolean debug){
+    this.debug = debug;
     cpu = new Chip8Cpu();
     ram = new Ram(4000);
     PPU = new Chip8PPU(12);
@@ -30,9 +30,11 @@ public class Chip8 extends GameSystem implements Observer{
     bus = new Chip8Bus(cpu, ram, delayTimer, soundTimer, PPU,keypad);
     cpu.loadFonts();
     cpu.reset();
+    GridBagConstraints gbc = new GridBagConstraints();
+    setLayout(new GridBagLayout());
+    gbc.gridx = 1;
+    gbc.gridy = 1;
     if(debug){
-      setLayout(new GridBagLayout());
-      GridBagConstraints gbc = new GridBagConstraints();
       gbc.gridx = 1;
       gbc.gridy = 0;
       add(cpu,gbc);
@@ -92,10 +94,9 @@ public class Chip8 extends GameSystem implements Observer{
   }
 
 	@Override
-	public void loadRom(String filepath) {
+	public void loadRom(File file) {
     try{
-      FileInputStream fileInputStream = new FileInputStream(filepath);
-      File file = new File(filepath);
+      FileInputStream fileInputStream = new FileInputStream(file);
       int singleByte;
       int currentByteIndex = 0;
       short rom[] = new short[(int)file.length()];
@@ -106,6 +107,7 @@ public class Chip8 extends GameSystem implements Observer{
       cpu.loadRom(rom);
     }
     catch(IOException e){
+      System.out.println("failed to load rom");
     }
 	}
 
@@ -120,8 +122,11 @@ public class Chip8 extends GameSystem implements Observer{
           step = true;
           break;
         case KeyEvent.VK_R:
-          reset();
-          elapsecycles =0;
+          if(paused){
+            reset();
+            paused = false;
+            elapsecycles =0;
+          }
           break;
       }
     }

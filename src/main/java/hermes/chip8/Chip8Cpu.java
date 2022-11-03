@@ -140,7 +140,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
       bus.cpuWrite(12,(short)1,true);
       for (int a =0; a < 64 * 32; a++){
         int address = a + vramStartAddress;
-        bus.cpuWrite(address,data,false);
+        bus.cpuWrite(address,(short)0,false);
       }
       return 0;
 
@@ -468,6 +468,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
         for(int b=0; b< 8; b++){
           finalAddress = vramStartAddress + ((64 * ((y_pos + a)%32)) + ((b + x_pos) % 64));
           originalPixel = bus.cpuRead(finalAddress , false);
+          if(originalPixel >1) originalPixel = 1;
           finalPixel = (short)(originalPixel ^ (spriteByte>>(7-b)) & 0x1);
           if(originalPixel == 1 && originalPixel != finalPixel){
             registers[0xf].write(1);
@@ -752,7 +753,6 @@ public class Chip8Cpu  extends JPanel implements Cpu {
       }
     }
     cycles--;
-    render();
   }
 
   @Override
