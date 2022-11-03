@@ -4,14 +4,13 @@ import java.awt.Insets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.awt.Dimension;
 
-public class Chip8 extends GameSystem implements KeyListener{
+public class Chip8 extends GameSystem implements Observer{
   private Chip8Cpu cpu;
+  private Chip8Keypad keypad;
   private Ram ram;
   private Chip8PPU PPU;
   private Timer delayTimer;
@@ -27,7 +26,8 @@ public class Chip8 extends GameSystem implements KeyListener{
     PPU = new Chip8PPU(12);
     delayTimer = new Timer(4);
     soundTimer = new Timer(8);
-    bus = new Chip8Bus(cpu, ram, delayTimer, soundTimer, PPU);
+    keypad = new Chip8Keypad(16);
+    bus = new Chip8Bus(cpu, ram, delayTimer, soundTimer, PPU,keypad);
     cpu.loadFonts();
     cpu.reset();
     if(debug){
@@ -46,6 +46,8 @@ public class Chip8 extends GameSystem implements KeyListener{
       add(PPU,gbc);
     }
     else add(PPU);
+    addObserver(this);
+    addObserver(keypad);
     addKeyListener(this);
   }
 
@@ -81,29 +83,13 @@ public class Chip8 extends GameSystem implements KeyListener{
       ram.render();
     }
 	}
-
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-    switch(arg0.getKeyCode()){
-      case 80:
-        paused = !paused;
-        break;
-      case 78:
-        step = true;
-        break;
-    }
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		
-	}
+  public void reset(){
+    cpu.reset();
+    PPU.reset();
+    keypad.reset();
+    delayTimer.reset();
+    soundTimer.reset();
+  }
 
 	@Override
 	public void loadRom(String filepath) {
@@ -120,6 +106,24 @@ public class Chip8 extends GameSystem implements KeyListener{
       cpu.loadRom(rom);
     }
     catch(IOException e){
+    }
+	}
+
+	@Override
+	public void Update(KeyEvent keyEvent) {
+    if(keyEvent.getID() == KeyEvent.KEY_PRESSED){
+      switch(keyEvent.getKeyCode()){
+        case 80:
+          paused = !paused;
+          break;
+        case 78:
+          step = true;
+          break;
+        case KeyEvent.VK_R:
+          reset();
+          elapsecycles =0;
+          break;
+      }
     }
 	}
 }

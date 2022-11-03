@@ -34,5 +34,10 @@ public int getBaseAddress() {
 public void connectBus(Bus bus) {
 	
 }
+
+@Override
+public void reset() {
+  data = 0;
+}
 }
 

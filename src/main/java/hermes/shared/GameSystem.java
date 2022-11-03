@@ -1,15 +1,17 @@
 package hermes.shared;
 import javax.swing.JPanel;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.awt.*;
-public abstract class GameSystem extends JPanel implements Runnable
+public abstract class GameSystem extends JPanel implements Runnable, Observable, KeyListener
 {
-  private final int PWIDTH =256;
-  private final int PHEIGHT=240;
   private Thread animator;
   private volatile boolean running = false;
   private long period = 1000 / 60;
   private int NO_DELAY_PER_YIELD = 10;
   protected boolean debug = true;
+  private ArrayList<Observer> obsList = new ArrayList<>();
 
   public GameSystem() {
     setBackground(Color.black);
@@ -63,5 +65,29 @@ public abstract class GameSystem extends JPanel implements Runnable
   public abstract void update();
   public abstract void render();
   public abstract void loadRom(String filename);
+  public void notifyObservers(KeyEvent keyEvent){
+    for(Observer obs: obsList){
+      obs.Update(keyEvent);
+    }
+  }
+
+  public void addObserver(Observer obs){
+    if(obs !=null)obsList.add(obs);
+  }
+
+	@Override
+	public void keyPressed(KeyEvent keyEvent) {
+    notifyObservers(keyEvent);
+	}
+
+	@Override
+	public void keyReleased(KeyEvent keyEvent) {
+    notifyObservers(keyEvent);
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		
+	}
 
 }

@@ -96,4 +96,10 @@ public class Chip8PPU extends JPanel implements Controller {
 public void connectBus(Bus bus) {
   this.bus = bus;
 }
+
+@Override
+public void reset() {
+  data = 0;
+	
+}
 }

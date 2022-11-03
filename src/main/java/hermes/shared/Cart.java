@@ -34,4 +34,12 @@ public class Cart implements Controller{
 	public void connectBus(Bus bus) {
 		
 	}
+
+	@Override
+	public void reset() {
+    for(short data: rom){
+      data = 0;
+    }
+		
+	}
 }

@@ -5,4 +5,5 @@ public interface Controller{
   public abstract void clock();
   public abstract int getBaseAddress();
   public abstract void connectBus(Bus bus);
+  public abstract void reset();
 }

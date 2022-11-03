@@ -486,11 +486,11 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     @Override
     public int execute() {
       final int Vx = (opcode >> 8) & 0xf;
-      final int keyInReg = registers[Vx].read();
-      final short status = bus.cpuRead(6,true);
-      if (status == 1){
-        final short key = bus.cpuRead(4,true);
-        if (key == keyInReg) pc.write(pc.read() + 2);
+      final short keyInReg = (short)registers[Vx].read();
+      bus.cpuWrite(16,keyInReg,true);
+      short key = bus.cpuRead(16,true);
+      if (key == 1){
+        pc.write(pc.read() + 2);
       }
       return 0;
     }
@@ -502,16 +502,12 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     @Override
     public int execute() {
       final int Vx = (opcode >> 8) & 0xf;
-      final int keyInReg = registers[Vx].read();
-      final short status = bus.cpuRead(6,true);
-      if (status == 1){
-        final short key = bus.cpuRead(4,true);
-        if (key != keyInReg) pc.write(pc.read() + 2);
-      }
-      else{
+      final short keyInReg = (short)registers[Vx].read();
+      bus.cpuWrite(16,keyInReg,true);
+      short key = bus.cpuRead(16,true);
+      if (key != 1){
         pc.write(pc.read() + 2);
       }
-
       return 0;
 
     }
@@ -523,7 +519,7 @@ public class Chip8Cpu  extends JPanel implements Cpu {
 
     @Override
     public int execute() {
-      final int Vx = (opcode >> 12) & 0xf;
+      final int Vx = (opcode >> 8) & 0xf;
       registers[Vx].write(bus.cpuRead(4,true));
       return 0;
     }
@@ -535,11 +531,20 @@ public class Chip8Cpu  extends JPanel implements Cpu {
 
     @Override
     public int execute() {
-      short key = 0;
-      short status = bus.cpuRead(3,true);
-      if (status ==1){
-        final int Vx = (opcode >> 12) & 0xf;
-        key = bus.cpuRead(4,true);
+
+      short key=0;
+      boolean keyPressed = false;
+      for(int a=0; a< 16;a++){
+        bus.cpuWrite(16,(short)a,true);
+        key = bus.cpuRead(16,true);
+        if(key == 1){
+          key = (short)key;
+          keyPressed = true;
+          break;
+        }
+      }
+      if (keyPressed){
+        final int Vx = (opcode >> 8) & 0xf;
         registers[Vx].write(key);
       }
       else pc.write(pc.read() -2);
@@ -668,7 +673,9 @@ public class Chip8Cpu  extends JPanel implements Cpu {
     this.pc.write(0x200);
     this.index.write(0);
     this.sp.write(this.stackStartAddress);
-    //this.inst00E0.op.execute();
+    this.inst00E0.op.execute();
+    this.cycles = 0;
+    this.opcode =0;
   }
 
   @Override
