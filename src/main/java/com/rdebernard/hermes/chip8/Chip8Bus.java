@@ -1,5 +1,5 @@
-package hermes.chip8;
-import hermes.shared.*;
+package com.rdebernard.hermes.chip8;
+import com.rdebernard.hermes.shared.*;
 
 public class Chip8Bus extends Bus{
   private Controller delayTimer;

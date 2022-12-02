@@ -1,9 +1,9 @@
-package hermes.chip8;
+package com.rdebernard.hermes.chip8;
 import java.awt.event.KeyEvent;
 
-import hermes.shared.Bus;
-import hermes.shared.Controller;
-import hermes.shared.Observer;
+import com.rdebernard.hermes.shared.Bus;
+import com.rdebernard.hermes.shared.Controller;
+import com.rdebernard.hermes.shared.Observer;
 
 public class Chip8Keypad implements Controller, Observer{
   private short data;

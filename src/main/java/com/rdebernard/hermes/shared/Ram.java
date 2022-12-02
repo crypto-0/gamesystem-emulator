@@ -1,4 +1,4 @@
-package hermes.shared;
+package com.rdebernard.hermes.shared;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;

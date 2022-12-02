@@ -1,4 +1,4 @@
-package hermes.shared;
+package com.rdebernard.hermes.shared;
 
 public interface Cpu {
   public void reset();

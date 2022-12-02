@@ -1,9 +1,8 @@
-package hermes.chip8;
-import hermes.shared.*;
+package com.rdebernard.hermes.chip8;
+import com.rdebernard.hermes.shared.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

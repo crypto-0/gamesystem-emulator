@@ -1,4 +1,4 @@
-package hermes.shared;
+package com.rdebernard.hermes.shared;
 public interface Controller{
   public abstract short read(int ioAddress);
   public abstract void write(int ioAddress,short data);

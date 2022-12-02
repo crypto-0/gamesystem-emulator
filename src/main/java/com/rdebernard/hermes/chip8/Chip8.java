@@ -1,11 +1,9 @@
-package hermes.chip8;
-import hermes.shared.*;
+package com.rdebernard.hermes.chip8;
+import com.rdebernard.hermes.shared.*;
 import java.awt.Insets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 

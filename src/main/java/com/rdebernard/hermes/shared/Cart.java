@@ -1,4 +1,4 @@
-package hermes.shared;
+package com.rdebernard.hermes.shared;
 
 public class Cart implements Controller{
   private short rom[];

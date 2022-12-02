@@ -1,5 +1,5 @@
-package hermes.chip8;
-import hermes.shared.*;
+package com.rdebernard.hermes.chip8;
+import com.rdebernard.hermes.shared.*;
 
 public class Timer implements Controller {
   private short data;

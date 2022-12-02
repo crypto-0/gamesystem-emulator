@@ -1,14 +1,11 @@
-package hermes;
-import java.io.File;
+package com.rdebernard.hermes;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import javax.swing.JFrame;
-import hermes.chip8.Chip8;
+import com.rdebernard.hermes.chip8.Chip8;
 
 public class Hermes{
   static boolean debug;
@@ -30,7 +27,7 @@ public class Hermes{
   }
 
   private  static void help(){
-    System.out.println("Usage: java -jar Hermes.jar [OPTIONS]");
+    System.out.println("Usage: java -jar hermes-1.0-SNAPSHOT-jar-with-dependencies.jar [OPTIONS]");
     System.out.println();
     System.out.println("Options:");
     System.out.println("  --help Show this message and exit");
